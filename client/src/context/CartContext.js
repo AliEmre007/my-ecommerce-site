@@ -22,10 +22,11 @@ export function CartProvider({ children }) {
       );
     } else {
       // If it's a new item, add it to the cart with qty: 1
+      
+      // THIS IS THE LINE TO FIX:
       setCartItems([...cartItems, { ...product, qty: 1 }]);
     }
   };
-
   // We'll add a 'removeFromCart' function here later
 
   return (

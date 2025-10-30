@@ -1,7 +1,8 @@
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import HomeScreen from './screens/HomeScreen';
-import ProductScreen from './screens/ProductScreen'; // 1. Import
+import ProductScreen from './screens/ProductScreen';
+import CartScreen from './screens/CartScreen'; // 1. Import
 
 function App() {
   return (
@@ -12,9 +13,8 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<HomeScreen />} />
-          
-          {/* 2. Add/Uncomment this line */}
           <Route path="/product/:id" element={<ProductScreen />} />
+          <Route path="/cart" element={<CartScreen />} /> {/* 2. Add this route */}
         </Routes>
       </main>
     </div>
