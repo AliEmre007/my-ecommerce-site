@@ -1,7 +1,7 @@
 import './App.css';
-// 1. Import routing components and your new screen
 import { Routes, Route } from 'react-router-dom';
 import HomeScreen from './screens/HomeScreen';
+import ProductScreen from './screens/ProductScreen'; // 1. Import
 
 function App() {
   return (
@@ -10,13 +10,11 @@ function App() {
         <h1>My E-commerce Site</h1>
       </header>
       <main>
-        {/* 2. Define your routes */}
         <Routes>
-          {/* This route shows the HomeScreen component at the "/" URL */}
           <Route path="/" element={<HomeScreen />} />
-
-          {/* We will create the ProductScreen component next */}
-          {/* <Route path="/product/:id" element={<ProductScreen />} /> */}
+          
+          {/* 2. Add/Uncomment this line */}
+          <Route path="/product/:id" element={<ProductScreen />} />
         </Routes>
       </main>
     </div>
