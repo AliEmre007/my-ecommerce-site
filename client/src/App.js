@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import CartScreen from './screens/CartScreen'; // 1. Import
+import ShippingScreen from './screens/ShippingScreen';
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomeScreen />} />
           <Route path="/product/:id" element={<ProductScreen />} />
-          <Route path="/cart" element={<CartScreen />} /> {/* 2. Add this route */}
+          <Route path="/cart" element={<CartScreen />} /> 
+          <Route path="/shipping" element={<ShippingScreen />} />
         </Routes>
       </main>
     </div>

@@ -1,41 +1,70 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
-// 1. Create the Context
+// Get cart items from localStorage
+const cartItemsFromStorage = localStorage.getItem('cartItems')
+  ? JSON.parse(localStorage.getItem('cartItems'))
+  : [];
+
+// --- NEW ---
+// Get shipping address from localStorage
+const shippingAddressFromStorage = localStorage.getItem('shippingAddress')
+  ? JSON.parse(localStorage.getItem('shippingAddress'))
+  : {}; // Start with an empty object if it doesn't exist
+// --- END NEW ---
+
 const CartContext = createContext();
 
-// 2. Create the "Provider" Component
-// This component will wrap our app and provide the cart state
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState([]); // This is our global state
+  const [cartItems, setCartItems] = useState(cartItemsFromStorage);
+  
+  // --- NEW ---
+  const [shippingAddress, setShippingAddress] = useState(shippingAddressFromStorage);
+  // --- END NEW ---
 
-  // 3. Add to Cart Function
+  useEffect(() => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+  }, [cartItems]);
+
   const addToCart = (product) => {
-    // Check if the item is already in the cart
+    // ... (your existing addToCart function - no changes needed)
     const exist = cartItems.find((item) => item._id === product._id);
 
     if (exist) {
-      // If it exists, just update the quantity
       setCartItems(
         cartItems.map((item) =>
           item._id === product._id ? { ...exist, qty: exist.qty + 1 } : item
         )
       );
     } else {
-      // If it's a new item, add it to the cart with qty: 1
-      
-      // THIS IS THE LINE TO FIX:
       setCartItems([...cartItems, { ...product, qty: 1 }]);
     }
   };
-  // We'll add a 'removeFromCart' function here later
+
+  const removeFromCart = (id) => {
+    setCartItems(cartItems.filter((item) => item._id !== id));
+  };
+
+  // --- NEW ---
+  // A new function to save the address to state and localStorage
+  const saveShippingAddress = (data) => {
+    setShippingAddress(data);
+    localStorage.setItem('shippingAddress', JSON.stringify(data));
+  };
+  // --- END NEW ---
 
   return (
-    // 4. Provide the state and functions to all children
-    <CartContext.Provider value={{ cartItems, addToCart }}>
+    <CartContext.Provider 
+      value={{ 
+        cartItems, 
+        shippingAddress, // Provide the address to the app
+        addToCart, 
+        removeFromCart,
+        saveShippingAddress // Provide the new function
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 }
 
-// 5. Export the context so we can use it in other components
 export default CartContext;

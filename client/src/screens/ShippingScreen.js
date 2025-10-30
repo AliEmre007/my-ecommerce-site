@@ -1,25 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // 1. Import useContext
 import { useNavigate } from 'react-router-dom';
-// We will use our context later to save the address
-// import { useContext } from 'react'; 
-// import CartContext from '../context/CartContext';
+import CartContext from '../context/CartContext'; // 2. Import our context
 
 function ShippingScreen() {
-  // We'll pre-fill this from localStorage later
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [postalCode, setPostalCode] = useState('');
-  const [country, setCountry] = useState('');
+  // 3. Get context data
+  const { shippingAddress, saveShippingAddress } = useContext(CartContext);
+
+  // 4. Pre-fill state from context (or with an empty string)
+  const [address, setAddress] = useState(shippingAddress.address || '');
+  const [city, setCity] = useState(shippingAddress.city || '');
+  const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || '');
+  const [country, setCountry] = useState(shippingAddress.country || '');
 
   const navigate = useNavigate();
 
   const submitHandler = (e) => {
     e.preventDefault();
-    // 1. LATER: We will call a context function here to save the address
-    console.log('Saving address:', { address, city, postalCode, country });
-    // 2. Navigate to the next step (which we will build later)
-    // navigate('/payment');
-    alert('Address saved! (Payment page coming next)');
+    // 5. Call context function to save the address
+    saveShippingAddress({ address, city, postalCode, country });
+    
+    // 6. Navigate to the next step
+    navigate('/payment');
   };
 
   return (
