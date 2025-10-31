@@ -17,20 +17,19 @@ const paymentMethodFromStorage = localStorage.getItem('paymentMethod')
 
 const CartContext = createContext();
 
+// client/src/context/CartContext.js
+
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(cartItemsFromStorage);
   const [shippingAddress, setShippingAddress] = useState(shippingAddressFromStorage);
-  
-  // --- NEW ---
   const [paymentMethod, setPaymentMethod] = useState(paymentMethodFromStorage);
-  // --- END NEW ---
 
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // ... (your existing addToCart function) ...
   const addToCart = (product) => {
+    // ... (your existing addToCart logic)
     const exist = cartItems.find((item) => item._id === product._id);
     if (exist) {
       setCartItems(
@@ -43,34 +42,40 @@ export function CartProvider({ children }) {
     }
   };
 
-  // ... (your existing removeFromCart function) ...
   const removeFromCart = (id) => {
+    // ... (your existing removeFromCart logic)
     setCartItems(cartItems.filter((item) => item._id !== id));
   };
 
-  // ... (your existing saveShippingAddress function) ...
   const saveShippingAddress = (data) => {
+    // ... (your existing saveShippingAddress logic)
     setShippingAddress(data);
     localStorage.setItem('shippingAddress', JSON.stringify(data));
   };
 
-  // --- NEW ---
   const savePaymentMethod = (data) => {
+    // ... (your existing savePaymentMethod logic)
     setPaymentMethod(data);
     localStorage.setItem('paymentMethod', JSON.stringify(data));
   };
-  // --- END NEW ---
+
+  // --- ADD THIS FUNCTION ---
+  const clearCart = () => {
+    setCartItems([]); // Just set the cart to an empty array
+  };
+  // --- END ADD ---
 
   return (
     <CartContext.Provider 
       value={{ 
         cartItems, 
         shippingAddress,
-        paymentMethod, // Provide the payment method
+        paymentMethod,
         addToCart, 
         removeFromCart,
         saveShippingAddress,
-        savePaymentMethod // Provide the new function
+        savePaymentMethod,
+        clearCart // <-- AND ADD THIS
       }}
     >
       {children}
