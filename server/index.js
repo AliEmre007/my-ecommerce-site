@@ -1,4 +1,19 @@
 const express = require('express');
+const mongoose = require('mongoose'); // 1. Import mongoose
+require('dotenv').config(); // 2. Import dotenv to load .env variables
+
+// 3. Connect to MongoDB
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB Connected...');
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1); // Exit with failure
+  }
+};
+
+connectDB(); // 4. Run the connection function
 
 // Dummy data for our products
 const products = [
