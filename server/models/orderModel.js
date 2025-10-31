@@ -34,7 +34,11 @@ const orderSchema = new mongoose.Schema(
     },
     
     // We'll add 'paymentResult' here later (from PayPal/Stripe)
-
+    itemsPrice: {
+      type: Number,
+      required: true,
+      default: 0.0,
+    },
     taxPrice: {
       type: Number,
       required: true,
