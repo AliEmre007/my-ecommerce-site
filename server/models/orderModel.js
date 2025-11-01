@@ -32,6 +32,13 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    paymentResult: {
+      id: { type: String },
+      status: { type: String }, // e.g., 'succeeded'
+      update_time: { type: String }, // from Stripe
+      email_address: { type: String }, // from Stripe
+    },
     
     // We'll add 'paymentResult' here later (from PayPal/Stripe)
     itemsPrice: {

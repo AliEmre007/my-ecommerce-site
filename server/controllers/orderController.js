@@ -32,6 +32,40 @@ const getOrderById = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Update order to paid
+ * @route   PUT /api/orders/:id/pay
+ * @access  Private (for now, public)
+ */
+const updateOrderToPaid = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      // 1. Set the order to paid
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      
+      // 2. Save the payment details from Stripe (sent in the req body)
+      order.paymentResult = {
+        id: req.body.id,
+        status: req.body.status,
+        update_time: req.body.update_time,
+        email_address: req.body.receipt_email, // Stripe calls this receipt_email
+      };
+
+      // 3. Save the updated order to the database
+      const updatedOrder = await order.save();
+      
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Error updating order: ${error.message}` });
+  }
+};
+
 
 const addOrderItems = async (req, res) => {
   try {
@@ -78,4 +112,4 @@ const addOrderItems = async (req, res) => {
   }
 };
 
-export { addOrderItems, getOrderById };
+export { addOrderItems, getOrderById, updateOrderToPaid };
