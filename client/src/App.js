@@ -2,6 +2,7 @@ import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import ProtectedRoute from './components/ProtectedRoute'; // 1. Import
+import ProfileScreen from './screens/ProfileScreen';
 
 // Import all your screens
 import HomeScreen from './screens/HomeScreen';
@@ -35,7 +36,7 @@ function App() {
             <Route path="/payment" element={<PaymentScreen />} />
             <Route path="/placeorder" element={<PlaceOrderScreen />} />
             <Route path="/order/:id" element={<OrderScreen />} />
-            {/* We will add a /profile route here later */}
+            <Route path="/profile" element={<ProfileScreen />} />
           </Route>
           
         </Routes>

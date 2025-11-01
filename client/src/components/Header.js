@@ -22,6 +22,7 @@ function Header() {
             // If user is logged in:
             <div className="user-menu">
               <span>Hello, {userInfo.name}</span>
+              <Link to='/profile'>Profile</Link>
               <button onClick={logoutHandler}>Logout</button>
             </div>
           ) : (
