@@ -46,6 +46,36 @@ const registerUser = async (req, res) => {
   }
 };
 
-// We will add the 'loginUser' function here later
+/**
+ * @desc    Auth user & get token (Login)
+ * @route   POST /api/users/login
+ * @access  Public
+ */
+const loginUser = async (req, res) => {
+  try {
+    // 1. Get email and password from the request body
+    const { email, password } = req.body;
 
-export { registerUser };
+    // 2. Find the user in the database by their email
+    const user = await User.findOne({ email });
+
+    // 3. Check if user exists AND if the password matches
+    if (user && (await user.matchPassword(password))) {
+      // 4. If both are true, send back user data and a new token
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
+      });
+    } else {
+      // 5. If user not found or password doesn't match
+      res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Error logging in: ${error.message}` });
+  }
+};
+
+export { registerUser, loginUser };

@@ -35,6 +35,12 @@ userSchema.pre('save', async function (next) {
     next();
   }
 
+  // This lets us call 'user.matchPassword(password)' on any user instance
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  // 'bcrypt.compare' securely compares the plain text with the hash
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
   // 'genSalt' creates a "salt" to make the hash more secure
   const salt = await bcrypt.genSalt(10);
   // This 'this' refers to the user document
