@@ -1,27 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+// --- 1. Import Stripe libraries ---
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import CheckoutForm from '../components/CheckoutForm'; // Import your new form
+
+// --- Helper function to format prices ---
+const addDecimals = (num) => (Math.round(num * 100) / 100).toFixed(2);
+
 function OrderScreen() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // --- 2. Add state for Stripe ---
+  const [stripePromise, setStripePromise] = useState(null);
+  const [clientSecret, setClientSecret] = useState(null);
 
   const { id: orderId } = useParams();
 
   useEffect(() => {
-    // 1. Fetch the specific order from the backend
-    const fetchOrder = async () => {
+    const fetchOrderAndStripeConfig = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/orders/${orderId}`);
-        
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.message || 'Could not fetch order');
+
+        // 1. Fetch the order
+        const orderRes = await fetch(`/api/orders/${orderId}`);
+        if (!orderRes.ok) {
+          throw new Error('Could not fetch order');
         }
-        
-        const data = await res.json();
-        setOrder(data);
+        const orderData = await orderRes.json();
+        setOrder(orderData);
+
+        // 2. If order is NOT paid, fetch Stripe config
+        if (!orderData.isPaid) {
+          // Fetch Publishable Key
+          const configRes = await fetch('/api/config/stripe');
+          const { publishableKey } = await configRes.json();
+          setStripePromise(loadStripe(publishableKey));
+
+          // Create Payment Intent to get Client Secret
+          const intentRes = await fetch(`/api/orders/${orderId}/create-payment-intent`, {
+            method: 'POST',
+          });
+          if (!intentRes.ok) {
+            throw new Error('Could not create payment intent');
+          }
+          const { client_secret } = await intentRes.json();
+          setClientSecret(client_secret);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -29,24 +57,21 @@ function OrderScreen() {
       }
     };
 
-    fetchOrder();
+    fetchOrderAndStripeConfig();
   }, [orderId]); // Re-run if the orderId in the URL changes
 
-  // Helper function to format prices
-  const addDecimals = (num) => (Math.round(num * 100) / 100).toFixed(2);
+  // 3. Set Stripe Elements options
+  const options = {
+    clientSecret,
+    appearance: { theme: 'stripe' },
+  };
 
-  // 2. Show loading or error messages
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  if (error) {
-    return <div style={{ color: 'red' }}>Error: {error}</div>;
-  }
-  if (!order) {
-    return <div>Order not found.</div>;
-  }
+  // 4. Show loading/error messages
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
+  if (!order) return <div>Order not found.</div>;
 
-  // 3. Display the full order details
+  // 5. Display the full order details
   return (
     <div className="place-order-container">
       <h1>Order Details</h1>
@@ -61,7 +86,12 @@ function OrderScreen() {
             {order.shippingAddress.address}, {order.shippingAddress.city},{' '}
             {order.shippingAddress.postalCode}, {order.shippingAddress.country}
           </p>
-          {/* We'll add a 'Delivered' status here later */}
+          {/* --- Show a 'Delivered' status --- */}
+          {order.isDelivered ? (
+            <div style={{ color: 'green', fontWeight: 'bold' }}>Delivered on {order.deliveredAt}</div>
+          ) : (
+            <div style={{ color: 'red', fontWeight: 'bold' }}>Not Delivered</div>
+          )}
 
           {/* --- Payment --- */}
           <h2>Payment Method</h2>
@@ -69,7 +99,12 @@ function OrderScreen() {
             <strong>Method: </strong>
             {order.paymentMethod}
           </p>
-          {/* We'll add a 'Paid' status here later */}
+          {/* --- Show a 'Paid' status --- */}
+          {order.isPaid ? (
+            <div style={{ color: 'green', fontWeight: 'bold' }}>Paid on {new Date(order.paidAt).toLocaleString()}</div>
+          ) : (
+            <div style={{ color: 'red', fontWeight: 'bold' }}>Not Paid</div>
+          )}
 
           {/* --- Order Items --- */}
           <h2>Order Items</h2>
@@ -90,24 +125,20 @@ function OrderScreen() {
         <div className="order-total-column">
           {/* --- Order Total --- */}
           <h2>Order Summary</h2>
-          <div className="total-row">
-            <span>Items:</span>
-            <span>${order.itemsPrice}</span>
-          </div>
-          <div className="total-row">
-            <span>Shipping:</span>
-            <span>${order.shippingPrice}</span>
-          </div>
-          <div className="total-row">
-            <span>Tax:</span>
-            <span>${order.taxPrice}</span>
-          </div>
-          <div className="total-row total-price">
-            <span>Total:</span>
-            <span>${order.totalPrice}</span>
-          </div>
+          <div className="total-row"><span>Items:</span><span>${order.itemsPrice}</span></div>
+          <div className="total-row"><span>Shipping:</span><span>${order.shippingPrice}</span></div>
+          <div className="total-row"><span>Tax:</span><span>${order.taxPrice}</span></div>
+          <div className="total-row total-price"><span>Total:</span><span>${order.totalPrice}</span></div>
           
-          {/* We will add the PayPal payment button here */}
+          {/* --- 6. CONDITIONAL PAYMENT BLOCK --- */}
+          {/* If the order is not paid, AND stripe is ready, show the form */}
+          {!order.isPaid && stripePromise && clientSecret && (
+            <Elements options={options} stripe={stripePromise}>
+              <CheckoutForm orderId={order._id} totalPrice={order.totalPrice} />
+            </Elements>
+          )}
+          {/* --- END PAYMENT BLOCK --- */}
+
         </div>
       </div>
     </div>
