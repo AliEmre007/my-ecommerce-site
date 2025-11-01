@@ -1,5 +1,8 @@
 // server/controllers/orderController.js
 import Order from '../models/orderModel.js';
+import stripe from 'stripe';
+// Initialize the Stripe client with your secret key
+const stripeClient = stripe(process.env.STRIPE_SECRET_KEY);
 
 /**
  * @desc    Create a new order
@@ -66,6 +69,42 @@ const updateOrderToPaid = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Create a new stripe payment intent
+ * @route   POST /api/orders/:id/create-payment-intent
+ * @access  Private (for now, public)
+ */
+const createPaymentIntent = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order && !order.isPaid) {
+      // 1. Total price must be in the smallest currency unit (e.g., cents)
+      // We also use Math.round to avoid any floating point issues
+      const amountInCents = Math.round(order.totalPrice * 100);
+
+      // 2. Create the Payment Intent with Stripe
+      const paymentIntent = await stripeClient.paymentIntents.create({
+        amount: amountInCents,
+        currency: 'usd', // You can change this to your local currency
+        // We can add customer/metadata later
+      });
+
+      // 3. Send the secret back to the frontend
+      res.send({
+        client_secret: paymentIntent.client_secret,
+      });
+
+    } else if (order.isPaid) {
+      res.status(400).json({ message: 'Order is already paid' });
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Error creating payment intent: ${error.message}` });
+  }
+};
+
 
 const addOrderItems = async (req, res) => {
   try {
@@ -112,4 +151,4 @@ const addOrderItems = async (req, res) => {
   }
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid };
+export { addOrderItems, getOrderById, updateOrderToPaid, createPaymentIntent };

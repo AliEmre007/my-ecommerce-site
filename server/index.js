@@ -23,6 +23,11 @@ app.get('/', (req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes); // 4. Add the new order routes
 
+// This route will send the Stripe Publishable Key to the frontend
+app.get('/api/config/stripe', (req, res) => {
+  res.send({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
