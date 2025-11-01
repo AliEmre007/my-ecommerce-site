@@ -1,17 +1,17 @@
 import express from 'express';
 const router = express.Router();
-import { 
-  addOrderItems, 
+import {
+  addOrderItems,
   getOrderById,
   updateOrderToPaid,
-  createPaymentIntent // 1. Import
+  createPaymentIntent,
 } from '../controllers/orderController.js';
+import { protect } from '../middleware/authMiddleware.js'; // 1. Import
 
-router.route('/').post(addOrderItems);
-router.route('/:id').get(getOrderById);
-router.route('/:id/pay').put(updateOrderToPaid);
-
-// 2. Add the new payment intent route
-router.route('/:id/create-payment-intent').post(createPaymentIntent);
+// 2. Add 'protect' to each route
+router.route('/').post(protect, addOrderItems);
+router.route('/:id').get(protect, getOrderById);
+router.route('/:id/pay').put(protect, updateOrderToPaid);
+router.route('/:id/create-payment-intent').post(protect, createPaymentIntent);
 
 export default router;

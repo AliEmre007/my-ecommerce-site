@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import CartContext from '../context/CartContext';
+import AuthContext from '../context/AuthContext';
 
 function PlaceOrderScreen() {
   const {
@@ -9,6 +10,8 @@ function PlaceOrderScreen() {
     paymentMethod,
     clearCart,
   } = useContext(CartContext);
+
+  const { userInfo } = useContext(AuthContext);
   
   const navigate = useNavigate();
 
@@ -38,6 +41,7 @@ function PlaceOrderScreen() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${userInfo.token}`,
         },
         body: JSON.stringify({
           orderItems: cartItems,

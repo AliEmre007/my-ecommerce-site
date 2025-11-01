@@ -131,6 +131,7 @@ const addOrderItems = async (req, res) => {
           product: item._id, // Link to the product in the DB
           _id: undefined, // Let MongoDB create a new _id for this sub-document
         })),
+        user: req.user._id,
         shippingAddress,
         paymentMethod,
         itemsPrice,

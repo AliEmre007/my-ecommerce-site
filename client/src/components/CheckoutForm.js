@@ -4,6 +4,7 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
+import AuthContext from '../context/AuthContext';
 import './CheckoutForm.css'; // We'll create this file next
 
 // This 'orderId' and 'totalPrice' will be passed in from OrderScreen
@@ -13,6 +14,7 @@ export default function CheckoutForm({ orderId, totalPrice }) {
 
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { userInfo } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,7 +55,9 @@ export default function CheckoutForm({ orderId, totalPrice }) {
       try {
         const res = await fetch(`/api/orders/${orderId}/pay`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json',
+            Authorization: `Bearer ${userInfo.token}`,
+           },
           body: JSON.stringify({
             id: paymentIntent.id,
             status: paymentIntent.status,

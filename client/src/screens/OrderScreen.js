@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '../components/CheckoutForm'; // Import your new form
+import AuthContext from '../context/AuthContext';
 
 // --- Helper function to format prices ---
 const addDecimals = (num) => (Math.round(num * 100) / 100).toFixed(2);
@@ -17,7 +18,7 @@ function OrderScreen() {
   // --- 2. Add state for Stripe ---
   const [stripePromise, setStripePromise] = useState(null);
   const [clientSecret, setClientSecret] = useState(null);
-
+  const { userInfo } = useContext(AuthContext);
   const { id: orderId } = useParams();
 
   useEffect(() => {
@@ -26,9 +27,15 @@ function OrderScreen() {
         setLoading(true);
 
         // 1. Fetch the order
-        const orderRes = await fetch(`/api/orders/${orderId}`);
+        const orderRes = await fetch(`/api/orders/${orderId}`, {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        });
+
+        // --- FIX 1: Better Error Handling ---
+        // We check for NOT ok, and read the server's message
         if (!orderRes.ok) {
-          throw new Error('Could not fetch order');
+          const errorData = await orderRes.json();
+          throw new Error(errorData.message || 'Could not fetch order');
         }
         const orderData = await orderRes.json();
         setOrder(orderData);
@@ -43,10 +50,14 @@ function OrderScreen() {
           // Create Payment Intent to get Client Secret
           const intentRes = await fetch(`/api/orders/${orderId}/create-payment-intent`, {
             method: 'POST',
+            headers: { Authorization: `Bearer ${userInfo.token}` },
           });
           if (!intentRes.ok) {
-            throw new Error('Could not create payment intent');
+             // Also add better error handling here
+            const errorData = await intentRes.json();
+            throw new Error(errorData.message || 'Could not create payment intent');
           }
+          // We need to read the JSON from the successful response
           const { client_secret } = await intentRes.json();
           setClientSecret(client_secret);
         }
@@ -58,7 +69,7 @@ function OrderScreen() {
     };
 
     fetchOrderAndStripeConfig();
-  }, [orderId]); // Re-run if the orderId in the URL changes
+  }, [orderId, userInfo]); // Re-run if the orderId in the URL changes
 
   // 3. Set Stripe Elements options
   const options = {
