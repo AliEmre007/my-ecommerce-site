@@ -78,4 +78,28 @@ const loginUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser };
+/**
+ * @desc    Get user profile
+ * @route   GET /api/users/profile
+ * @access  Private
+ */
+const getUserProfile = async (req, res) => {
+  try {
+    // The 'protect' middleware already found the user and attached it to req.user
+    const user = req.user; 
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Error getting profile: ${error.message}` });
+  }
+};
+export { registerUser, loginUser, getUserProfile };
