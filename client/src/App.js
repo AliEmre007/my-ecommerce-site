@@ -9,13 +9,14 @@ import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import Header from './components/Header';
 
 function App() {
   return (
     <div className="App">
-      <header>
+      <Header>
         <h1>My E-commerce Site</h1>
-      </header>
+      </Header>
       <main>
         <Routes>
           <Route path="/" element={<HomeScreen />} />
