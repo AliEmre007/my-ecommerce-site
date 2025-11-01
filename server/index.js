@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js'; // 1. Import new order routes
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 connectDB();
@@ -21,7 +22,8 @@ app.get('/', (req, res) => {
 
 // 3. Tell Express to use your routes
 app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes); // 4. Add the new order routes
+app.use('/api/orders', orderRoutes);
+app.use('/api/users', userRoutes); 
 
 // This route will send the Stripe Publishable Key to the frontend
 app.get('/api/config/stripe', (req, res) => {
