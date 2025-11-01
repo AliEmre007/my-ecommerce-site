@@ -3,7 +3,11 @@ import mongoose from 'mongoose';
 // A Mongoose Schema is the blueprint for our data
 const productSchema = new mongoose.Schema(
   {
-    // We'll add a 'user' field later (to track who created the product)
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User', // This links it to the User model
+    },
     name: {
       type: String,
       required: true,

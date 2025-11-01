@@ -17,8 +17,13 @@ const orderItemSchema = new mongoose.Schema({
 // This is the main Order blueprint
 const orderSchema = new mongoose.Schema(
   {
-    // We'll add a 'user' field later (who placed the order)
     
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+
     orderItems: [orderItemSchema], // An array of items
     
     shippingAddress: {
