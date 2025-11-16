@@ -152,4 +152,20 @@ const addOrderItems = async (req, res) => {
   }
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid, createPaymentIntent };
+
+/**
+ * @desc    Get logged in user's orders
+ * @route   GET /api/orders/myorders
+ * @access  Private
+ */
+const getMyOrders = async (req, res) => {
+  try {
+    // The 'protect' middleware gives us req.user
+    // We find all orders where the 'user' field matches the logged-in user's ID
+    const orders = await Order.find({ user: req.user._id });
+    res.json(orders);
+  } catch (error){
+    res.status(500).json({ message: `Error fetching orders: ${error.message}` });
+  }
+};
+export { addOrderItems, getOrderById, updateOrderToPaid, createPaymentIntent, getMyOrders };
