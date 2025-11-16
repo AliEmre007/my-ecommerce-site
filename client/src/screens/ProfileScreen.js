@@ -46,6 +46,7 @@ function ProfileScreen() {
   }, [userInfo, navigate]);
 
   // 3. Handle form submission (we'll build the backend for this next)
+// 3. Handle form submission
   const submitHandler = async (e) => {
     e.preventDefault();
     
@@ -58,27 +59,27 @@ function ProfileScreen() {
     setSuccess(false);
     setLoading(true);
     
-    // In our next step, we will create the PUT /api/users/profile endpoint
-    alert('Update logic is the next step!');
-    setLoading(false);
-    
-    /*
-    // --- THIS IS WHAT WE WILL ADD NEXT ---
+    // --- THIS IS THE UPDATED LOGIC ---
     try {
+      // 1. Call your new PUT endpoint
       const res = await fetch('/api/users/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo.token}`, // Send the token
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password }), // Send the new data
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to update profile');
+      }
       
-      // Update the global state and localStorage
+      // 2. On success, update the global state and localStorage
       login(data);
+      
+      // 3. Show success message and clear passwords
       setSuccess(true);
       setPassword('');
       setConfirmPassword('');
@@ -88,7 +89,7 @@ function ProfileScreen() {
     } finally {
       setLoading(false);
     }
-    */
+    // --- END UPDATED LOGIC ---
   };
 
   return (
