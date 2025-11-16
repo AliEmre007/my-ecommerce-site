@@ -102,4 +102,44 @@ const getUserProfile = async (req, res) => {
     res.status(500).json({ message: `Error getting profile: ${error.message}` });
   }
 };
-export { registerUser, loginUser, getUserProfile };
+
+/**
+ * @desc    Update user profile
+ * @route   PUT /api/users/profile
+ * @access  Private
+ */
+const updateUserProfile = async (req, res) => {
+  try {
+    // The 'protect' middleware already gives us the user
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      // 1. Update the fields
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+
+      // 2. Only update the password if a new one was sent
+      if (req.body.password) {
+        user.password = req.body.password;
+        // The 'pre-save' hook in userModel.js will hash this
+      }
+
+      // 3. Save the updated user
+      const updatedUser = await user.save();
+
+      // 4. Send back the new data and a new token
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+        token: generateToken(updatedUser._id),
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Error updating profile: ${error.message}` });
+  }
+};
+export { registerUser, loginUser, getUserProfile, updateUserProfile };
