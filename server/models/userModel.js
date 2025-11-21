@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true, // No two users can have the same email
+      unique: true,
     },
     password: {
       type: String,
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       required: true,
-      default: false, // Default new users to NOT be admins
+      default: false,
     },
   },
   {
@@ -27,25 +27,23 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// --- BEST PRACTICE: Password Hashing ---
-// This function will run *before* a user is saved ('.pre('save', ...)')
+// This function hashes the password before saving
 userSchema.pre('save', async function (next) {
-  // Only hash the password if it's new or has been modified
   if (!this.isModified('password')) {
     next();
   }
-
-  // This lets us call 'user.matchPassword(password)' on any user instance
-userSchema.methods.matchPassword = async function (enteredPassword) {
-  // 'bcrypt.compare' securely compares the plain text with the hash
-  return await bcrypt.compare(enteredPassword, this.password);
-};
-
-  // 'genSalt' creates a "salt" to make the hash more secure
   const salt = await bcrypt.genSalt(10);
-  // This 'this' refers to the user document
   this.password = await bcrypt.hash(this.password, salt);
 });
+
+
+// --- THIS IS THE MISSING FUNCTION ---
+// This adds the 'matchPassword' method to every user object
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+// --- END FIX ---
+
 
 const User = mongoose.model('User', userSchema);
 export default User;
