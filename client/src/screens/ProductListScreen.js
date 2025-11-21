@@ -105,11 +105,12 @@ function ProductListScreen() {
                 <td>Category</td>
                 <td>Brand</td>
                 <td>
-                  <button style={{ marginRight: '10px' }}>Edit</button>
-                  <button 
-                    onClick={() => deleteHandler(product._id)}
-                    style={{ color: 'red' }}
-                  >
+                  {/* Change the Edit button to a Link */}
+                  <Link to={`/admin/product/${product._id}/edit`}>
+                    <button style={{ marginRight: '10px' }}>Edit</button>
+                  </Link>
+
+                  <button onClick={() => deleteHandler(product._id)} style={{ color: 'red' }}>
                     Delete
                   </button>
                 </td>

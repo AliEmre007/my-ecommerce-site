@@ -79,4 +79,34 @@ const createProduct = async (req, res) => {
     res.status(500).json({ message: `Error creating product: ${error.message}` });
   }
 };
-export { getProducts, getProductById, deleteProduct, createProduct };
+
+/**
+ * @desc    Update a product
+ * @route   PUT /api/products/:id
+ * @access  Private/Admin
+ */
+const updateProduct = async (req, res) => {
+  try {
+    const { name, price, description, image, brand, category, inStock } = req.body;
+
+    const product = await Product.findById(req.params.id);
+
+    if (product) {
+      product.name = name || product.name;
+      product.price = price || product.price;
+      product.description = description || product.description;
+      product.image = image || product.image;
+      product.brand = brand || product.brand;
+      product.category = category || product.category;
+      product.inStock = inStock || product.inStock;
+
+      const updatedProduct = await product.save();
+      res.json(updatedProduct);
+    } else {
+      res.status(404).json({ message: 'Product not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: `Error updating product: ${error.message}` });
+  }
+};
+export { getProducts, getProductById, deleteProduct, createProduct, updateProduct };
