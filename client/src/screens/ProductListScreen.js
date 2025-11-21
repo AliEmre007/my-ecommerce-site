@@ -49,9 +49,28 @@ function ProductListScreen() {
     }
   };
 
-  const createProductHandler = () => {
-    // We will build this in the next step
-    console.log('Create product');
+  // 3. Create Product Handler
+  const createProductHandler = async () => {
+    if (window.confirm('Are you sure you want to create a new product?')) {
+      try {
+        // Call the create API
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        
+        alert('Product Created!');
+        // Refresh the list to see the new item
+        fetchProducts(); 
+      } catch (err) {
+        alert(err.message);
+      }
+    }
   };
 
   return (
