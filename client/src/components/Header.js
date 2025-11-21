@@ -31,6 +31,9 @@ function Header() {
                   <Link to='/admin/productlist' style={{ marginLeft: '10px', color: 'orange' }}>
                     Products
                   </Link>
+                  <Link to='/admin/orderlist' style={{ marginLeft: '10px', color: 'orange' }}>
+                    Orders
+                  </Link>
                 </>
               )}
               {/* --- END NEW LINKS --- */}
