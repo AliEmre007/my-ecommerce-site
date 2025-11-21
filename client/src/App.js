@@ -19,6 +19,7 @@ import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import UserListScreen from './screens/UserListScreen'; 
+import ProductListScreen from './screens/ProductListScreen';
 
 function App() {
   return (
@@ -45,6 +46,8 @@ function App() {
           {/* --- Admin Routes (Admin Users Only) --- */}
           <Route element={<AdminRoute />}>
             <Route path="/admin/userlist" element={<UserListScreen />} />
+            <Route path="/admin/productlist" element={<ProductListScreen />} />
+
           </Route>
 
         </Routes>

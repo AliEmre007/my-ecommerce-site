@@ -1,12 +1,17 @@
-// server/routes/productRoutes.js
 import express from 'express';
 const router = express.Router();
-import { getProducts, getProductById } from '../controllers/productController.js';
+import {
+  getProducts,
+  getProductById,
+  deleteProduct, // 1. Import
+} from '../controllers/productController.js';
+import { protect, admin } from '../middleware/authMiddleware.js'; // 2. Import
 
-// When a GET request comes to '/', use the getProducts function
 router.route('/').get(getProducts);
 
-// When a GET request comes to '/:id', use the getProductById function
-router.route('/:id').get(getProductById);
+router
+  .route('/:id')
+  .get(getProductById)
+  .delete(protect, admin, deleteProduct); // 3. Add the DELETE route
 
 export default router;

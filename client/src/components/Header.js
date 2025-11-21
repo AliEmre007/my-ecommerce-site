@@ -22,13 +22,18 @@ function Header() {
               <span>Hello, {userInfo.name}</span>
               <Link to='/profile'>Profile</Link>
               
-              {/* --- NEW ADMIN LINK --- */}
+              {/* --- NEW ADMIN LINKS --- */}
               {userInfo.isAdmin && (
-                <Link to='/admin/userlist' style={{ marginLeft: '10px', color: 'orange' }}>
-                  Users (Admin)
-                </Link>
+                <>
+                  <Link to='/admin/userlist' style={{ marginLeft: '10px', color: 'orange' }}>
+                    Users (Admin)
+                  </Link>
+                  <Link to='/admin/productlist' style={{ marginLeft: '10px', color: 'orange' }}>
+                    Products
+                  </Link>
+                </>
               )}
-              {/* --- END NEW LINK --- */}
+              {/* --- END NEW LINKS --- */}
               
               <button onClick={logoutHandler}>Logout</button>
             </div>
