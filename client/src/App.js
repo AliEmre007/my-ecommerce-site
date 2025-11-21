@@ -1,10 +1,13 @@
+import React from 'react';
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import ProtectedRoute from './components/ProtectedRoute'; // 1. Import
-import ProfileScreen from './screens/ProfileScreen';
 
-// Import all your screens
+// --- COMPONENTS ---
+import Header from './components/Header';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+
+// --- SCREENS ---
 import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import CartScreen from './screens/CartScreen';
@@ -14,6 +17,8 @@ import ShippingScreen from './screens/ShippingScreen';
 import PaymentScreen from './screens/PaymentScreen';
 import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrderScreen from './screens/OrderScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import UserListScreen from './screens/UserListScreen'; 
 
 function App() {
   return (
@@ -28,17 +33,20 @@ function App() {
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/register" element={<RegisterScreen />} />
 
-          {/* --- Protected Routes --- */}
-          {/* 2. Create a parent route that uses the component */}
+          {/* --- Protected Routes (Logged in Users) --- */}
           <Route element={<ProtectedRoute />}>
-            {/* 3. All routes nested inside here are now protected */}
             <Route path="/shipping" element={<ShippingScreen />} />
             <Route path="/payment" element={<PaymentScreen />} />
             <Route path="/placeorder" element={<PlaceOrderScreen />} />
             <Route path="/order/:id" element={<OrderScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
           </Route>
-          
+
+          {/* --- Admin Routes (Admin Users Only) --- */}
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/userlist" element={<UserListScreen />} />
+          </Route>
+
         </Routes>
       </main>
     </div>

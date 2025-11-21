@@ -17,19 +17,24 @@ function Header() {
         <div>
           <Link to='/cart'>Cart</Link>
 
-          {/* 3. Add conditional logic */}
           {userInfo ? (
-            // If user is logged in:
             <div className="user-menu">
               <span>Hello, {userInfo.name}</span>
               <Link to='/profile'>Profile</Link>
+              
+              {/* --- NEW ADMIN LINK --- */}
+              {userInfo.isAdmin && (
+                <Link to='/admin/userlist' style={{ marginLeft: '10px', color: 'orange' }}>
+                  Users (Admin)
+                </Link>
+              )}
+              {/* --- END NEW LINK --- */}
+              
               <button onClick={logoutHandler}>Logout</button>
             </div>
           ) : (
-            // If user is not logged in:
             <Link to='/login'>Sign In</Link>
           )}
-
         </div>
       </nav>
     </header>

@@ -30,4 +30,14 @@ const protect = async (req, res, next) => {
 };
 
 // We'll add an 'admin' middleware here later
-export { protect };
+const admin = (req, res, next) => {
+  // We check if the user exists AND if their isAdmin flag is true
+  if (req.user && req.user.isAdmin) {
+    next(); // Keep going
+  } else {
+    res.status(401).json({ message: 'Not authorized as an admin' });
+  }
+};
+
+
+export { protect, admin };
