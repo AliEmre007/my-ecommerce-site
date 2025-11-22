@@ -1,50 +1,56 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import AuthContext from '../context/AuthContext'; // 1. Import context
+import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap'; // 1. Import Bootstrap components
+import AuthContext from '../context/AuthContext';
 
 function Header() {
-  // 2. Get auth state and functions
   const { userInfo, logout } = useContext(AuthContext);
 
   const logoutHandler = () => {
-    logout(); // Call the logout function from context
+    logout();
   };
 
   return (
     <header>
-      <nav>
-        <Link to='/'>My E-commerce Site</Link>
-        <div>
-          <Link to='/cart'>Cart</Link>
+      {/* Dark theme navbar that collapses on mobile */}
+      <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
+        <Container>
+          {/* Brand Logo */}
+          <Navbar.Brand as={Link} to="/">My E-commerce Site</Navbar.Brand>
+          
+          {/* Hamburger Toggle Button */}
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto">
+              
+              <Nav.Link as={Link} to="/cart">
+                Cart
+              </Nav.Link>
 
-          {userInfo ? (
-            <div className="user-menu">
-              <span>Hello, {userInfo.name}</span>
-              <Link to='/profile'>Profile</Link>
-              
-              {/* --- NEW ADMIN LINKS --- */}
-              {userInfo.isAdmin && (
-                <>
-                  <Link to='/admin/userlist' style={{ marginLeft: '10px', color: 'orange' }}>
-                    Users (Admin)
-                  </Link>
-                  <Link to='/admin/productlist' style={{ marginLeft: '10px', color: 'orange' }}>
-                    Products
-                  </Link>
-                  <Link to='/admin/orderlist' style={{ marginLeft: '10px', color: 'orange' }}>
-                    Orders
-                  </Link>
-                </>
+              {userInfo ? (
+                <NavDropdown title={userInfo.name} id="username">
+                  <NavDropdown.Item as={Link} to="/profile">Profile</NavDropdown.Item>
+                  <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <Nav.Link as={Link} to="/login">
+                  Sign In
+                </Nav.Link>
               )}
-              {/* --- END NEW LINKS --- */}
-              
-              <button onClick={logoutHandler}>Logout</button>
-            </div>
-          ) : (
-            <Link to='/login'>Sign In</Link>
-          )}
-        </div>
-      </nav>
+
+              {/* Admin Menu */}
+              {userInfo && userInfo.isAdmin && (
+                <NavDropdown title="Admin" id="adminmenu">
+                  <NavDropdown.Item as={Link} to="/admin/userlist">Users</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/admin/productlist">Products</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/admin/orderlist">Orders</NavDropdown.Item>
+                </NavDropdown>
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
     </header>
   );
 }

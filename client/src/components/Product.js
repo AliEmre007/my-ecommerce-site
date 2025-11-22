@@ -1,19 +1,27 @@
 import React from 'react';
-import './Product.css';
-import { Link } from 'react-router-dom'; // 1. Import Link
+import { Link } from 'react-router-dom';
+import { Card } from 'react-bootstrap'; // Import Card
 
 function Product({ product }) {
   return (
-    // 2. Wrap the card in a Link to the product's page
-    // We use a template literal (backticks ``) to build the URL
-    <Link to={`/product/${product._id}`} className="product-link">
-      <div className="product-card">
-        <div className="product-card-body">
-          <h3>{product.name}</h3>
-          <p>${product.price}</p>
-        </div>
-      </div>
-    </Link>
+    // 'my-3' = margin-y: 1rem, 'p-3' = padding: 1rem
+    <Card className="my-3 p-3 rounded">
+      <Link to={`/product/${product._id}`}>
+        <Card.Img src={product.image} variant="top" />
+      </Link>
+
+      <Card.Body>
+        <Link to={`/product/${product._id}`} style={{ textDecoration: 'none' }}>
+          <Card.Title as="div">
+            <strong>{product.name}</strong>
+          </Card.Title>
+        </Link>
+
+        <Card.Text as="h3">
+          ${product.price}
+        </Card.Text>
+      </Card.Body>
+    </Card>
   );
 }
 
