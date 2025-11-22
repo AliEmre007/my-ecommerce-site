@@ -1,3 +1,5 @@
+import path from 'path';
+import { fileURLToPath } from 'url'; // Needed for ES Modules
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
@@ -29,6 +31,22 @@ app.use('/api/users', userRoutes);
 app.get('/api/config/stripe', (req, res) => {
   res.send({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
 });
+
+// --- DEPLOYMENT CONFIGURATION ---
+
+// 1. Fix for __dirname in ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 2. Tell Express where the 'build' folder is
+// We step out of 'server', into 'client', then 'build'
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// 3. For any route that isn't an API route, serve the React index.html
+app.get('*', (req, res) =>
+  res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'))
+);
+// --------------------------------
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
