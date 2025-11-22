@@ -18,9 +18,9 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-app.get('/', (req, res) => {
-  res.send('Hello from the E-commerce Server!');
-});
+// app.get('/', (req, res) => {
+//   res.send('Hello from the E-commerce Server!');
+// });
 
 // 3. Tell Express to use your routes
 app.use('/api/products', productRoutes);
